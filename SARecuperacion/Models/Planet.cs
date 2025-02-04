@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SARecuperacion.Models
 {
-    public class Character
+    public class Planet
     {
         public int Id { get; set; }
         public string Name { get; set; }

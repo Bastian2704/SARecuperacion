@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,9 +15,10 @@ namespace SARecuperacion.ViewModels
     {
         private readonly SAService _apiService;
         private ObservableCollection<Character> _characters;
+        private ObservableCollection<Planet> _planets;
         private bool _isLoading;
+        private Planet _selectedPlanet;
         private string _searchName;
-
 
         public ObservableCollection<Character> Characters
         {
@@ -25,6 +27,31 @@ namespace SARecuperacion.ViewModels
             {
                 _characters = value;
                 OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<Planet> Planets
+        {
+            get => _planets;
+            set
+            {
+                _planets = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Planet SelectedPlanet
+        {
+            get => _selectedPlanet;
+            set
+            {
+                _selectedPlanet = value;
+                OnPropertyChanged();
+                if (_selectedPlanet != null)
+                {
+                    // Al seleccionar un planeta, cargar los personajes de ese planeta
+                    LoadCharactersByPlanetAsync();
+                }
             }
         }
 
@@ -47,34 +74,50 @@ namespace SARecuperacion.ViewModels
                 OnPropertyChanged();
             }
         }
-    
 
-
-        public ICommand LoadCharactersCommand { get; }
         public ICommand SearchCommand { get; }
-
+        public ICommand LoadCharactersCommand { get; }
+        public ICommand LoadPlanetsCommand { get; }
 
         public SACharacterViewModel()
         {
             _apiService = new SAService();
+            LoadCharactersCommand = new Command(async () => await LoadCharactersAsync());
             SearchCommand = new Command(async () => await SearchCharactersAsync());
-
+            LoadPlanetsCommand = new Command(async () => await LoadPlanetsAsync());
         }
+
+        private async Task LoadPlanetsAsync()
+        {
+            IsLoading = true;
+            var planets = await _apiService.GetAllPlanetsAsync();
+            Planets = new ObservableCollection<Planet>(planets);
+            IsLoading = false;
+        }
+
+        private async Task LoadCharactersByPlanetAsync()
+        {
+            if (SelectedPlanet == null)
+            {
+                return;
+            }
+
+            IsLoading = true;
+
+            var characters = await _apiService.GetCharactersByPlanetAsync(SelectedPlanet.Id);
+            Characters = new ObservableCollection<Character>(characters);
+
+            IsLoading = false;
+        }
+
         private async Task SearchCharactersAsync()
         {
-            if (string.IsNullOrWhiteSpace(SearchName))
-            {
-                // Si no se ingresa ningún nombre, cargar todos los personajes
-                await LoadCharactersAsync();
-            }
-            else
-            {
-                // Si se ingresa un nombre, cargar los personajes filtrados por nombre
-                IsLoading = true;
-                var characters = await _apiService.GetCharactersByNameAsync(SearchName);
-                Characters = new ObservableCollection<Character>(characters);
-                IsLoading = false;
-            }
+            IsLoading = true;
+
+            var characters = await _apiService.GetCharactersByNameAsync(SearchName);
+            Characters = new ObservableCollection<Character>(characters);
+
+            IsLoading = false;
         }
 
         private async Task LoadCharactersAsync()

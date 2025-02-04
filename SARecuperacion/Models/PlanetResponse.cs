@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace SARecuperacion.Models
 {
-    public class Character
+    public class PlanetResponse
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public List<Planet> Items { get; set; }
+        public Meta Meta { get; set; }
+        public Links Links { get; set; }
+
     }
 }

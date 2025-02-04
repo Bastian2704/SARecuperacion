@@ -12,9 +12,14 @@
     <StackLayout Padding="20">
         <Label Text="Buscar por nombre:" />
         <Entry Placeholder="Ingrese el nombre" />
+        
 
         <Button Text="Buscar" Command="{Binding SearchCommand}" />
+        
         <ActivityIndicator IsRunning="{Binding IsLoading}" />
+        <Picker ItemsSource="{Binding Planets}" ItemDisplayBinding="{Binding Name}" SelectedItem="{Binding SelectedPlanet}" />
+
+
         <ListView ItemsSource="{Binding Characters}">
             <ListView.ItemTemplate>
                 <DataTemplate>
