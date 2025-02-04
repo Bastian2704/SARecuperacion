@@ -85,6 +85,9 @@ namespace SARecuperacion.ViewModels
             LoadCharactersCommand = new Command(async () => await LoadCharactersAsync());
             SearchCommand = new Command(async () => await SearchCharactersAsync());
             LoadPlanetsCommand = new Command(async () => await LoadPlanetsAsync());
+
+            LoadPlanetsCommand.Execute(null);
+
         }
 
         private async Task LoadPlanetsAsync()
